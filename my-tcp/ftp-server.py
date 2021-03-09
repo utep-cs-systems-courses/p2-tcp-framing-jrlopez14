@@ -50,4 +50,4 @@ while True:
                 f_socket.send_message("Complete")
         else:
             os.write(1, "Invalid Request!".encode())
-        #conn.shutdown(socket.SHUT_WR)
+        conn.shutdown(socket.SHUT_WR)
