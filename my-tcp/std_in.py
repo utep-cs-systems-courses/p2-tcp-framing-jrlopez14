@@ -37,6 +37,4 @@ def readfile(filename):
     while line != "":
         lines += line
         line = readline(fd)
-    print(lines)
     return lines
-
