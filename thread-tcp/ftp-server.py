@@ -5,7 +5,7 @@
 import socket, sys, re, os
 sys.path.append("../lib")       # for params
 import params
-import framed_socket
+import framed_socket, Worker
 
 switchesVarDefaults = (
     (('-l', '--listenPort') ,'listenPort', 50001),

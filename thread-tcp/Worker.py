@@ -4,7 +4,7 @@ import sys, os
 import socket
 from time import time
 from threading import Thread, enumerate
-
+import framed_socket
 threadNum = 0
 
 class Worker(Thread):
@@ -23,7 +23,7 @@ class Worker(Thread):
             filename = f_socket.receive_message()
             os.write(1, "Recieved Message: {}\n".format(filename).encode())
             if os.path.isfile("./server_files/" +  filename):
-                os.write(1, "Sent Message" + f_socket.send_message("Error: Duplicate File") + '\n')                        .encode())
+                os.write(1, ("Sent Message" + f_socket.send_message("Error: Duplicate File") + '\n'                ).encode())
             else:
                 os.write(1, ("Sent Message: " + f_socket.send_message("Okay") + "\n").encode())
                 fd = os.open("./server_files/" + filename, os.O_CREAT | os.O_WRONLY)
