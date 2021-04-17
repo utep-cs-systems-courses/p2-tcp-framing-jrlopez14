@@ -23,6 +23,7 @@ class Worker(Thread):
         global transferLock
         transferLock.acquire()
         if filename in inTransfer:
+            transferLock.release()
             return False
         inTransfer.add(filename)
         transferLock.release()
