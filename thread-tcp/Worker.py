@@ -3,9 +3,12 @@
 import sys, os
 import socket
 from time import time
-from threading import Thread, enumerate
+from threading import Thread, enumerate, Lock
 import framed_socket
+
 threadNum = 0
+inTransfer = set()
+transferLock = Lock()
 
 class Worker(Thread):
     def __init__(self, conn, addr):
@@ -14,6 +17,21 @@ class Worker(Thread):
         threadNum += 1
         self.conn = conn
         self.addr = addr
+
+    def check_transfer(self,filename):
+        global inTransfer
+        global transferLock
+        transferLock.acquire()
+        if filename in inTransfer:
+            return False
+        inTransfer.add(filename)
+        transferLock.release()
+        return True
+    
+    def end_transfer(self,filename):
+        global inTransfer
+        return inTransfer.remove(filename)
+        
     def run(self):
         f_socket = framed_socket.Framed_Socket(self.conn)
 
@@ -21,8 +39,11 @@ class Worker(Thread):
         os.write(1, "Recieved Message: {}\n".format(request).encode())
         if request == "Send":
             filename = f_socket.receive_message()
+
             os.write(1, "Recieved Message: {}\n".format(filename).encode())
-            if os.path.isfile("./server_files/" +  filename):
+            if (self.check_transfer(filename) == False):
+                os.write(1, ("File: {} is currently in transfer!".format(filename)).encode())
+            elif os.path.isfile("./server_files/" +  filename):
                 os.write(1, ("Sent Message" + f_socket.send_message("Error: Duplicate File") + '\n'                ).encode())
             else:
                 os.write(1, ("Sent Message: " + f_socket.send_message("Okay") + "\n").encode())
